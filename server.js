@@ -1,4 +1,5 @@
 require('dotenv').config()
+const mongodb = require('./database/mongodb.js')
 
 const express = require('express')
 const app = express()
@@ -12,5 +13,6 @@ const hostname = '0.0.0.0';
 const port = 3001;
 
 app.listen(port, hostname, () => {
+    mongodb.connect()
     console.log(`Server running at http://${hostname}:${port}/`);
 });
