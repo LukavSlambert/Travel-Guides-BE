@@ -16,7 +16,9 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "fluent-json-schema": "^4.2.1",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "6.5",
+    "mongoose": "^8.3.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
