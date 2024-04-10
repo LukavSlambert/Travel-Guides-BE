@@ -6,6 +6,8 @@ const app = express()
 app.use(require('cors')());
 app.use(express.json());
 
+app.use('/signup', require('./routes/users/signup.js'));
+
 const hostname = '0.0.0.0';
 const port = 3001;
 
