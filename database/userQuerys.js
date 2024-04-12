@@ -38,15 +38,6 @@ async function GetUserByEmail(email) {
     }
 }
 
-async function LoginUser(email, password) {
-    try {
-        const user = await User.find({ email: email, password: password })
-        return user
-    } catch (err) {
-        console.log(err)
-    }
-}
-
 async function CreateUser(user) {
     try {
         await User.create({
@@ -65,5 +56,4 @@ module.exports = {
     GetUserByName,
     GetUserByEmail,
     CreateUser,
-    LoginUser
 }
