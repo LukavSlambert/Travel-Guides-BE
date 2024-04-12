@@ -11,8 +11,8 @@ const userQuerys = require('../../database/userQuerys.js')
 router.post('/', validate(usersSchemas.newUserSchema), async (req, res) => {
     try {
 
-        const UserExist = await userQuerys.GetUserByEmail(req.body.email)
-        if (UserExist.length !== 0) {
+        const [UserExist] = await userQuerys.GetUserByEmail(req.body.email)
+        if (UserExist) {
             res.statusMessage = "User with this email already exist";
             res.status(400).end();
         } else {
