@@ -23,7 +23,7 @@ router.post('/', validate(usersSchemas.newUserSchema), async (req, res) => {
             }
             await userQuerys.CreateUser(user)
             delete user.password
-            const token = auth.sign({ id: user.id });
+            const token = auth.sign({ id: user._id });
             res.send({ user, token })
         }
 
