@@ -11,7 +11,9 @@ router.get('/', async (req, res) => {
     try {
         const [user] = await userQuerys.GetUserByEmail(req.body.email)
         if (!user) return res.status(400).send("Email or password incorrect")
+
         const password_valid = await bcrypt.compare(req.body.password, user.password);
+
         if (!password_valid) {
             res.statusMessage = "Email or password incorrect";
             res.status(400).end();

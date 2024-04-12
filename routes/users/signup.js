@@ -12,12 +12,12 @@ const userQuerys = require('../../database/userQuerys.js')
 
 router.post('/', validate(usersSchemas.newUserSchema), async (req, res) => {
     try {
-        const hash_password = await bcrypt.hash(req.body.password, saltRounds);
         const [UserExist] = await userQuerys.GetUserByEmail(req.body.email)
         if (UserExist) {
             res.statusMessage = "User with this email already exist";
             res.status(400).end();
         } else {
+            const hash_password = await bcrypt.hash(req.body.password, saltRounds);
             const user = {
                 username: req.body.username,
                 email: req.body.email,
