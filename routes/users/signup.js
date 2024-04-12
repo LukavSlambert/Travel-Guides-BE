@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 const validate = require('../../libs/validation');
 const usersSchemas = require('../../libs/schemas/users.js')
@@ -10,7 +12,7 @@ const userQuerys = require('../../database/userQuerys.js')
 
 router.post('/', validate(usersSchemas.newUserSchema), async (req, res) => {
     try {
-
+        const hash_password = await bcrypt.hash(req.body.password, saltRounds);
         const [UserExist] = await userQuerys.GetUserByEmail(req.body.email)
         if (UserExist) {
             res.statusMessage = "User with this email already exist";
@@ -19,7 +21,7 @@ router.post('/', validate(usersSchemas.newUserSchema), async (req, res) => {
             const user = {
                 username: req.body.username,
                 email: req.body.email,
-                password: req.body.password,
+                password: hash_password,
             }
             await userQuerys.CreateUser(user)
             delete user.password
