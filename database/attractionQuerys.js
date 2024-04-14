@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-// const Attraction = require("./models/attraction.js");
 const Schema = mongoose.Schema;
 
 // const newAtt = new Attraction({
@@ -13,28 +12,64 @@ const Schema = mongoose.Schema;
 //   rating: 5.0,
 // });
 
-const NewAttraction = new Schema({
+const attractionSchema = new Schema({
   date: Date,
   duration: String,
+  title: String,
   content: String,
   contributors: [{ type: "ObjectId", ref: "User" }],
-  tags: String,
+  tags: [String],
   location: String,
   author: { type: "ObjectId", ref: "User" },
   rating: Number,
 });
 
-const Attraction = mongoose.model("Attraction", NewAttraction);
+const Attraction = mongoose.model("Attraction", attractionSchema);
 
-async function CreateAttraction(newAtt) {
+async function findAttractions() {
   try {
-    await Attraction.create();
-    return;
+    const attractions = await Attraction.find();
+    return attractions;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+async function createAttraction(newAtt) {
+  try {
+    const attraction = new Attraction(newAtt);
+    await attraction.save();
+    return attraction;
   } catch (err) {
     console.error(err);
   }
 }
 
-// CreateAttraction(newAtt);
+async function deleteAttractionById(attractionId) {
+  try {
+    const result = await Attraction.deleteOne({ _id: attractionId });
+    return result;
+  } catch (err) {
+    console.error(err);
+  }
+}
 
-module.exports = { CreateAttraction };
+async function updateAttraction(attractionId, updatedValues) {
+  try {
+    const updatedAttraction = await Attraction.findOneAndUpdate(
+      { _id: attractionId },
+      { $set: updatedValues },
+      { new: true }
+    );
+    return updatedAttraction;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+module.exports = {
+  createAttraction,
+  deleteAttractionById,
+  updateAttraction,
+  findAttractions,
+};

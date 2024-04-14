@@ -9,7 +9,7 @@ app.use(express.json());
 
 app.use("/signup", require("./routes/users/signup.js"));
 app.use("/login", require("./routes/users/login.js"));
-app.use("/addAttraction", require("./routes/attractions/add.js"));
+app.use("/addAttraction", require("./routes/attractions/creation.js"));
 
 const hostname = "0.0.0.0";
 const port = 3001;
