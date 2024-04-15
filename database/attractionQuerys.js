@@ -42,7 +42,7 @@ const attractionSchema = new mongoose.Schema({
   },
 });
 
-const createAttraction = async function (Attraction, newAtt) {
+const createAttraction = async function (newAtt) {
   try {
     const attraction = new Attraction(newAtt);
     await attraction.save();
@@ -52,7 +52,7 @@ const createAttraction = async function (Attraction, newAtt) {
   }
 };
 
-const findAttractions = async function (Attraction) {
+const findAttractions = async function () {
   try {
     const attractions = await Attraction.find();
     return attractions;
@@ -62,7 +62,7 @@ const findAttractions = async function (Attraction) {
   }
 };
 
-const deleteAttractionById = async function (Attraction, attractionId) {
+const deleteAttractionById = async function (attractionId) {
   try {
     const result = await Attraction.deleteOne({ _id: attractionId });
     return result;
@@ -71,11 +71,7 @@ const deleteAttractionById = async function (Attraction, attractionId) {
   }
 };
 
-const updateAttraction = async function (
-  Attraction,
-  attractionId,
-  updatedValues
-) {
+const updateAttraction = async function (attractionId, updatedValues) {
   try {
     const updatedAttraction = await Attraction.findOneAndUpdate(
       { _id: attractionId },
