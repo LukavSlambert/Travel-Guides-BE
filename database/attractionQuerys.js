@@ -1,41 +1,48 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-
-// const newAtt = new Attraction({
-//   date: new Date(),
-//   duration: "1d",
-//   content: "New attraction omg omg omg",
-//   contributors: [mongoose.Types.ObjectId("6619296ef98630fdb6656968")],
-//   tags: null,
-//   location: null,
-//   author: mongoose.Types.ObjectId("6619296ef98630fdb6656968"),
-//   rating: 5.0,
-// });
-
-const attractionSchema = new Schema({
-  date: Date,
-  duration: String,
-  title: String,
-  content: String,
-  contributors: [{ type: "ObjectId", ref: "User" }],
-  tags: [String],
-  location: String,
-  author: { type: "ObjectId", ref: "User" },
-  rating: Number,
+// Define the common schema for all events
+const attractionSchema = new mongoose.Schema({
+  country: { type: String, required: true },
+  city: {
+    type: String,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  addedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
+  },
+  image: {
+    type: String,
+  },
+  bookingLink: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        // Simple URL validation regex
+        return /^(ftp|http|https):\/\/[^ "]+$/.test(v);
+      },
+      message: (props) => `${props.value} is not a valid URL!`,
+    },
+  },
+  description: {
+    type: String,
+    maxlength: 400,
+  },
+  priceRange: {
+    type: String,
+    enum: ["cheap", "average", "expensive"],
+  },
 });
 
-const Attraction = mongoose.model("Attraction", attractionSchema);
-
-async function findAttractions() {
-  try {
-    const attractions = await Attraction.find();
-    return attractions;
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
-}
-async function createAttraction(newAtt) {
+const createAttraction = async function (Attraction, newAtt) {
   try {
     const attraction = new Attraction(newAtt);
     await attraction.save();
@@ -43,18 +50,32 @@ async function createAttraction(newAtt) {
   } catch (err) {
     console.error(err);
   }
-}
+};
 
-async function deleteAttractionById(attractionId) {
+const findAttractions = async function (Attraction) {
+  try {
+    const attractions = await Attraction.find();
+    return attractions;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
+const deleteAttractionById = async function (Attraction, attractionId) {
   try {
     const result = await Attraction.deleteOne({ _id: attractionId });
     return result;
   } catch (err) {
     console.error(err);
   }
-}
+};
 
-async function updateAttraction(attractionId, updatedValues) {
+const updateAttraction = async function (
+  Attraction,
+  attractionId,
+  updatedValues
+) {
   try {
     const updatedAttraction = await Attraction.findOneAndUpdate(
       { _id: attractionId },
@@ -65,11 +86,16 @@ async function updateAttraction(attractionId, updatedValues) {
   } catch (err) {
     console.error(err);
   }
-}
+};
 
+// Create the base model
+const Attraction = mongoose.model("Attraction", attractionSchema);
+
+// Now you can use these methods with each event type model
 module.exports = {
-  createAttraction,
-  deleteAttractionById,
+  Attraction,
   updateAttraction,
+  deleteAttractionById,
   findAttractions,
+  createAttraction,
 };
