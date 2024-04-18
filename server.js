@@ -9,6 +9,7 @@ app.use(express.json());
 
 app.use("/signup", require("./routes/users/signup.js"));
 app.use("/login", require("./routes/users/login.js"));
+app.use("/profile", require("./routes/users/profile.js"));
 app.use("/addAttraction", require("./routes/attractions/add.js"));
 
 const hostname = "0.0.0.0";
