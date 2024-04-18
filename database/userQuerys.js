@@ -31,7 +31,7 @@ async function GetUserByName(name) {
 
 async function GetUserByEmail(email) {
     try {
-        const user = await User.find({ email: email })
+        const [user] = await User.find({ email: email })
         return user
     } catch (err) {
         console.error(err)
