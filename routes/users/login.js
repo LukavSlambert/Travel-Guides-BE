@@ -7,12 +7,12 @@ const auth = require('../../libs/authentication.js')
 const userQuerys = require('../../database/userQuerys.js')
 
 
-router.get('/', async (req, res) => {
+router.get('/:email/:password', async (req, res) => {
     try {
-        const [user] = await userQuerys.GetUserByEmail(req.body.email)
+        const user = await userQuerys.GetUserByEmail(req.params.email)
         if (!user) return res.status(400).send("Email or password incorrect")
 
-        const password_valid = await bcrypt.compare(req.body.password, user.password);
+        const password_valid = await bcrypt.compare(req.params.password, user.password);
 
         if (!password_valid) {
             res.statusMessage = "Email or password incorrect";
