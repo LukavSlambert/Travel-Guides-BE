@@ -11,6 +11,10 @@ app.use("/signup", require("./routes/users/signup.js"));
 app.use("/login", require("./routes/users/login.js"));
 app.use("/profile", require("./routes/users/profile.js"));
 app.use("/addAttraction", require("./routes/attractions/add.js"));
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  next();
+});
 
 const hostname = "0.0.0.0";
 const port = 3001;
