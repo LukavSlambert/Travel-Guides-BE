@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const handleServerError = require('../libs/utility/ErrorHandlers')
 const password = process.env.secret_key;
 
 function sign(data) {

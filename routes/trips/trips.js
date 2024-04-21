@@ -42,4 +42,19 @@ router.put("/:id", validate(tripSchema), async (req, res) => {
   }
 });
 
+router.get("/", async (req, res) => {
+  const { countryCode, season, experience } = req.query;
+
+  try {
+    const filteredTrips = await tripQuerys.getTripsByFilters({
+      destination: countryCode,
+      season,
+      experience,
+    });
+    res.status(200).json(filteredTrips);
+  } catch (err) {
+    handleServerError(err, res);
+  }
+});
+
 module.exports = router;

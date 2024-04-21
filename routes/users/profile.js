@@ -7,10 +7,10 @@ const auth = require('../../libs/authentication.js')
 const userQuerys = require('../../database/userQuerys.js')
 
 
-router.get('/:email/:password', async (req, res) => {
+router.get('/:email/:password', auth.authenticate, async (req, res) => {
     try {
         const user = await userQuerys.GetUserByEmail(req.params.email)
-        if (!user) return res.status(400).send("Email or password incorrect")
+        if (!user) return res.status(400).send("User doesn't exist")
 
         const password_valid = await bcrypt.compare(req.params.password, user.password);
 
@@ -18,8 +18,7 @@ router.get('/:email/:password', async (req, res) => {
             res.statusMessage = "Email or password incorrect";
             res.status(400).end();
         } else {
-            const token = auth.sign({ id: user._id });
-            res.send({ user, token })
+            res.send(user)
         }
 
     } catch (err) {

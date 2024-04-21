@@ -1,26 +1,75 @@
 const mongoose = require("mongoose");
-const { Schema } = mongoose;
+const Schema = mongoose.Schema;
 
-// Define the schema for attraction, restaurant, and hotel
-const attractionSchema = new Schema({
-  name: String,
-  location: String,
-  description: String,
-});
-
-// Since all three have the same schema, we can reuse it for restaurant and hotel
-const restaurantSchema = attractionSchema;
-const hotelSchema = attractionSchema;
-
-// Define the trip schema with nested subdocuments
+// Define schema
 const tripSchema = new Schema({
-  attractions: [attractionSchema], // Array of subdocuments for attractions
-  restaurants: [restaurantSchema], // Array of subdocuments for restaurants
-  hotels: [hotelSchema], // Array of subdocuments for hotels
+  cityName: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  topRestaurants: [
+    {
+      name: {
+        type: String,
+        required: true,
+      },
+      description: {
+        type: String,
+        required: true,
+      },
+      budget: {
+        type: String,
+        enum: ["$", "$$", "$$$"], // Restrict budget to these values
+        required: true,
+      },
+    },
+  ],
+  topAttractions: [
+    {
+      name: {
+        type: String,
+        required: true,
+      },
+      description: {
+        type: String,
+        required: true,
+      },
+      budget: {
+        type: String,
+        enum: ["$", "$$", "$$$"], // Restrict budget to these values
+        required: true,
+      },
+    },
+  ],
+  topHotels: [
+    {
+      name: {
+        type: String,
+        required: true,
+      },
+      description: {
+        type: String,
+        required: true,
+      },
+      budget: {
+        type: String,
+        enum: ["$", "$$", "$$$"], // Restrict budget to these values
+        required: true,
+      },
+    },
+  ],
 });
+
+// Create model
+const Trip = mongoose.model("Trip", tripSchema);
+
+module.exports = Trip;
 
 // Compile the schema into a model
-const Trip = mongoose.model("Trip", tripSchema);
 
 const createTrip = async function (newTrip) {
   try {
