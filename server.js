@@ -9,7 +9,8 @@ app.use(express.json());
 
 app.use("/signup", require("./routes/users/signup.js"));
 app.use("/login", require("./routes/users/login.js"));
-app.use("/addGptData", require("./routes/gptData/creation.js"));
+app.use("/gptData", require("./routes/gptData/gptData.js"));
+app.use("/review", require("./routes/reviews/reviews.js"));
 
 const hostname = "0.0.0.0";
 const port = 3001;

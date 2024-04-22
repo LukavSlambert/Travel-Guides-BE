@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const validate = require("../../libs/validation");
+const validate = require("../../libs/validation.js");
 const handleServerError = require("../../libs/utility/ErrorHandlers.js");
 const {
   addToCollection,
