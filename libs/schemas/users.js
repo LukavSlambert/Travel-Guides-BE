@@ -5,5 +5,6 @@ const newUserSchema = S.object()
     .prop('username', S.string().required())
     .prop('email', S.string().required())
     .prop('password', S.string().required())
+    .prop('confirmPassword', S.string().required())
 
 exports.newUserSchema = newUserSchema;
