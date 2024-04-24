@@ -10,6 +10,8 @@ app.use(express.json());
 app.use("/signup", require("./routes/users/signup.js"));
 app.use("/login", require("./routes/users/login.js"));
 app.use("/gptData", require("./routes/gptData/addPlace.js"));
+app.use("/users", require("./routes/users/user.js"));
+app.use("/gpt", require("./routes/aiAPIs/apis.js"));
 app.use("/review", require("./routes/reviews/reviews.js"));
 
 const hostname = "0.0.0.0";
