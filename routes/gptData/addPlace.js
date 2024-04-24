@@ -3,35 +3,27 @@ const router = express.Router();
 const validate = require("../../libs/validation.js");
 const handleServerError = require("../../libs/utility/ErrorHandlers.js");
 const {
-  addToCollection,
-  Hotel,
-  Restaurant,
-  Attraction,
-} = require("../../database/gptQuerys.js");
-
-const chatGptData = {
-  hotels: [{ place: "1" }, { place: "2" }],
-  attractions: [{ place: "1" }, { place: "2" }],
-  resturants: [{ place: "1" }, { place: "2" }],
-};
-//todo- how to convert keys from front to the schema
-//todo- how to convert keys from model that not excist already- for example rating.
-
+  Hotels,
+  Restaurants,
+  Attractions,
+  getPlaceById,
+  addPlaceToCollection,
+} = require("../../database/placeQuery.js");
 router.post("/", async (req, res) => {
-  const { hotels, attractions, restaurants } = req.body;
-
   try {
-    const addedHotels = await addToCollection(hotels, Hotel);
-    const addedRestaurants = await addToCollection(restaurants, Restaurant);
-    const addedAttractions = await addToCollection(attractions, Attraction);
+    const place = req.body;
+    const { type } = place;
 
-    res.status(200).json({
-      hotels: addedHotels,
-      restaurants: addedRestaurants,
-      attractions: addedAttractions,
-    });
-  } catch (err) {
-    handleServerError(err, res);
+    let Model;
+    if (type === "hotel") Model = Hotels;
+    else if (type === "restaurant") Model = Restaurants;
+    else if (type === "attraction") Model = Attractions;
+
+    const savedPlace = await addPlaceToCollection(place, Model);
+    res.status(201).json(savedPlace);
+  } catch (error) {
+    console.log("Error in POST /add-place:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

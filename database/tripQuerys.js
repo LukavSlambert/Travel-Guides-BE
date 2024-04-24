@@ -1,19 +1,21 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 
-// Define schema
-const tripSchema = new Schema({
+const tripSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
+  date: {
+    type: Date,
+    required: true,
+  },
   cityName: {
     type: String,
     required: true,
   },
-  description: {
-    type: String,
-    required: true,
-  },
-  topRestaurants: [
+  cityInfo: [
     {
-      name: {
+      cityCode: {
         type: String,
         required: true,
       },
@@ -21,55 +23,38 @@ const tripSchema = new Schema({
         type: String,
         required: true,
       },
-      budget: {
+      lat: {
         type: String,
-        enum: ["$", "$$", "$$$"], // Restrict budget to these values
+        required: true,
+      },
+      lng: {
+        type: String,
         required: true,
       },
     },
   ],
-  topAttractions: [
+
+  restaurants: [
     {
-      name: {
-        type: String,
-        required: true,
-      },
-      description: {
-        type: String,
-        required: true,
-      },
-      budget: {
-        type: String,
-        enum: ["$", "$$", "$$$"], // Restrict budget to these values
-        required: true,
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Restaurant",
     },
   ],
-  topHotels: [
+  attractions: [
     {
-      name: {
-        type: String,
-        required: true,
-      },
-      description: {
-        type: String,
-        required: true,
-      },
-      budget: {
-        type: String,
-        enum: ["$", "$$", "$$$"], // Restrict budget to these values
-        required: true,
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Attraction",
+    },
+  ],
+  hotels: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Hotel",
     },
   ],
 });
 
-// Create model
 const Trip = mongoose.model("Trip", tripSchema);
-
-module.exports = Trip;
-
-// Compile the schema into a model
 
 const createTrip = async function (newTrip) {
   try {

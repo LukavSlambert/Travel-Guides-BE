@@ -18,6 +18,43 @@ router.post(
   }
 );
 
+// router.get("/:id", async (req, res) => {
+//   const placeId = req.params.id;
+//   console.log(placeId);
+//   try {
+//     const reviews = await reviewQuery.getReviews(placeId);
+//     console.log(reviews);
+//     res.status(200).json(reviews);
+//   } catch (err) {
+//     handleServerError(err, res);
+//   }
+// });
+
+router.get("/:cityCode/:placeName", async (req, res) => {
+  const { cityCode, placeName } = req.params;
+  console.log(cityCode, placeName);
+  try {
+    // Check if the place exists in the database
+    const existingPlace = await Place.findOne({
+      "cityInfo.cityCode": cityCode,
+      cityName: placeName,
+    });
+
+    if (existingPlace) {
+      // Place exists, return success message
+      res
+        .status(200)
+        .json({ message: "Place found in database.", place: existingPlace });
+    } else {
+      // Place doesn't exist, return a message indicating so
+      res.status(404).json({ message: "Place not found in database." });
+    }
+  } catch (err) {
+    // Handle any errors
+    handleServerError(err, res);
+  }
+});
+
 router.delete("/:id", async (req, res) => {
   const reviewId = req.params.id;
   try {
