@@ -38,6 +38,16 @@ async function GetUserByEmail(email) {
     }
 }
 
+async function GetUserByID(id) {
+    try {
+        const [user] = await User.find({ _id: id })
+        return user
+    } catch (err) {
+        console.error(err)
+    }
+}
+
+
 async function CreateUser(user) {
     try {
         await User.create({
@@ -51,9 +61,26 @@ async function CreateUser(user) {
     }
 }
 
+async function UpdateUser(id, data) {
+    try {
+        const user = await User.updateOne(
+            { _id: id },
+            {
+                email: data.email,
+                username: data.username,
+                password: data.password,
+            });
+        return user
+    } catch (err) {
+        console.error(err)
+    }
+}
+
 module.exports = {
     GetAllUsers,
     GetUserByName,
     GetUserByEmail,
+    GetUserByID,
     CreateUser,
+    UpdateUser,
 }
