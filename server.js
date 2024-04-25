@@ -18,10 +18,9 @@ app.use((req, res, next) => {
   next();
 });
 
-const hostname = "0.0.0.0";
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 10000;
 
-app.listen(port, hostname, () => {
+app.listen(port, () => {
   mongodb.connect();
-  console.log(`Server running at http://${hostname}:${port}/`);
+  console.log(`Server running at http://0.0.0.0:${port}/`);
 });
