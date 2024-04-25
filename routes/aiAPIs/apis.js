@@ -87,7 +87,7 @@ async function fetchOpenAi(prompt, count = 1) {
       model: "gpt-3.5-turbo-0125",
     });
     const gptResponse = completion.choices[0].message.content;
-    console.log('success fetching openAI')
+    console.log('success fetching openAI');
     return gptResponse;
   } catch (error) {
     if (count <= 3) {
@@ -104,6 +104,7 @@ function formatResponse(gptResponse, count = 1) {
       gptResponse = gptResponse.replace(/^```json|```$/g, "").trim();
     }
     const cleanResponse = gptResponse
+      .replace(/\r?\n|\r/g, "")
       .replace(/,\s*]/g, "]")
       .replace(/,\s*}/g, "}");
     const formattedResponse = JSON.parse(cleanResponse);
@@ -164,10 +165,14 @@ async function fetchDataFromGoogle(arrCity, cityName, countryCode) {
                     : null;
 
                 if (placeDetails.photos && placeDetails.photos.length > 0) {
-                  const photoReference = placeDetails.photos[0].photo_reference;
-                  const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${googleAPIKey}`;
-                  location.image = photoUrl;
+                  location.allImages = placeDetails.photos.map((photo) => {
+                    const photoReference = photo.photo_reference;
+                    const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${googleAPIKey}`;
+                    return photoUrl;
+                  });
+                  location.image = location.allImages[0];
                 } else {
+                  location.allImages = null;
                   location.image = null;
                 }
               }
@@ -175,6 +180,7 @@ async function fetchDataFromGoogle(arrCity, cityName, countryCode) {
               location.address = null;
               location.website = null;
               location.image = null;
+              location.allImages = null;
             }
           })
           .catch((error) => {
