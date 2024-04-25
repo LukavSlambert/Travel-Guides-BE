@@ -30,37 +30,38 @@ const openai = new OpenAI({
 const requestedFormatFromGPT = [
   {
     cityName: "",
-    cityInfo: [{ cityCode: "", description: "" }],
+    cityInfo: [
+      { cityCode: "", description: "" }
+    ],
     topRestaurants: [
       { name: "", description: "", budget: "" },
       { name: "", description: "", budget: "" },
-      { name: "", description: "", budget: "" },
+      { name: "", description: "", budget: "" }
     ],
     topAttractions: [
       { name: "", description: "" },
       { name: "", description: "" },
       { name: "", description: "" },
       { name: "", description: "" },
-      { name: "", description: "" },
+      { name: "", description: "" }
     ],
     topHotels: [
       { name: "", description: "", budget: "" },
       { name: "", description: "", budget: "" },
-      { name: "", description: "", budget: "" },
+      { name: "", description: "", budget: "" }
     ],
   },
 ];
 const secondPartPrompt = `
 - City name
-- Some info about the city (city regional code, description)
+- Some info about the city (cityCode, description)
 - Top three restaurants (name, description, budget)
 - Top five attractions (name, description)
 - Top three hotels (name, description, budget)
-Ensure that each field is filled correctly with relevant information and that five cities are returned. Double check the city regional code and make sure topHotels and topRestaurants follow the budget prerequisites, only topHotels and TopRestaurants should contain budget in it. The response should be structured in the following format:
+Ensure that each field is filled correctly with relevant information and that five cities are returned. Double check the cityCode and make sure topHotels and topRestaurants follow the budget prerequisites, only topHotels and TopRestaurants should contain budget in it. The response should be strictly structured in the following JSON format:
 ${JSON.stringify(requestedFormatFromGPT)}`;
 
 async function fetchPlaceDetails(placeId) {
-  console.log("fetching details from google");
   try {
     const detailResponse = await axios.get(
       "https://maps.googleapis.com/maps/api/place/details/json",
@@ -86,6 +87,7 @@ async function fetchOpenAi(prompt, count = 1) {
       model: "gpt-3.5-turbo-0125",
     });
     const gptResponse = completion.choices[0].message.content;
+    console.log('success fetching openAI')
     return gptResponse;
   } catch (error) {
     if (count <= 3) {
@@ -98,21 +100,20 @@ async function fetchOpenAi(prompt, count = 1) {
 function formatResponse(gptResponse, count = 1) {
   console.log("Formatting Response");
   try {
-    if (typeof gptResponse === "object") {
-      console.log("resp", gptResponse);
-      console.log("resp", typeof gptResponse);
-      return gptResponse;
+    if (gptResponse.startsWith("```json")) {
+      gptResponse = gptResponse.replace(/^```json|```$/g, "").trim();
     }
-    const formattedResponse = JSON.parse(gptResponse);
-
-    console.log("resp2", gptResponse);
-    console.log("resp2", typeof gptResponse);
+    const cleanResponse = gptResponse
+      .replace(/,\s*]/g, "]")
+      .replace(/,\s*}/g, "}");
+    const formattedResponse = JSON.parse(cleanResponse);
+    console.log("sucess formating response");
     return formattedResponse;
   } catch (error) {
     if (count <= 3) {
       return formatResponse(gptResponse, count + 1);
     }
-    console.log(gptResponse);
+    console.log("gptResponse l111",gptResponse);
     throw new Error(
       `Error formatting response from OpenAI count-${count},${error}`
     );
@@ -122,6 +123,7 @@ function formatResponse(gptResponse, count = 1) {
 async function fetchDataFromGoogle(arrCity, cityName, countryCode) {
   console.log("fetching data from google");
   try {
+    const promises = [];
     for (const locationType of [
       "topRestaurants",
       "topAttractions",
@@ -130,52 +132,64 @@ async function fetchDataFromGoogle(arrCity, cityName, countryCode) {
       for (const location of arrCity[locationType]) {
         const googleQuery =
           location.name + ", " + cityName + ", " + countryCode;
-        const response = await axios.get(
-          "https://maps.googleapis.com/maps/api/place/findplacefromtext/json",
-          {
-            params: {
-              key: googleAPIKey,
-              input: googleQuery,
-              inputtype: "textquery",
-              fields: ["place_id"],
-            },
-          }
-        );
-        if (
-          response.data.status === "OK" &&
-          response.data.candidates.length > 0
-        ) {
-          const placeId = response.data.candidates[0].place_id;
-          const placeDetails = await fetchPlaceDetails(placeId);
-          if (placeDetails.name) {
-            location.address =
-              typeof placeDetails.address === "string" &&
-              placeDetails.address.trim().length > 5
-                ? placeDetails.address
-                : "No Address Available";
-            location.website =
-              typeof placeDetails.website === "string" &&
-              placeDetails.website.trim().length > 5
-                ? placeDetails.website
-                : "No Website Available";
-
-            if (placeDetails.photos && placeDetails.photos.length > 0) {
-              const photoReference = placeDetails.photos[0].photo_reference;
-              console.log(`${placeDetails.name}`, photoReference.length);
-              const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${googleAPIKey}`;
-              location.image = photoUrl;
-            } else {
-              console.log("placeDetails", placeDetails);
-              location.image = "No Image Available";
+        const promise = axios
+          .get(
+            "https://maps.googleapis.com/maps/api/place/findplacefromtext/json",
+            {
+              params: {
+                key: googleAPIKey,
+                input: googleQuery,
+                inputtype: "textquery",
+                fields: ["place_id"],
+              },
             }
-          }
-        }
+          )
+          .then(async (response) => {
+            if (
+              response.data.status === "OK" &&
+              response.data.candidates.length > 0
+            ) {
+              const placeId = response.data.candidates[0].place_id;
+              const placeDetails = await fetchPlaceDetails(placeId);
+              if (placeDetails.name) {
+                location.address =
+                  typeof placeDetails.formatted_address === "string" &&
+                  placeDetails.formatted_address.trim().length > 5
+                    ? placeDetails.formatted_address
+                    : null;
+                location.website =
+                  typeof placeDetails.website === "string" &&
+                  placeDetails.website.trim().length > 5
+                    ? placeDetails.website
+                    : null;
+
+                if (placeDetails.photos && placeDetails.photos.length > 0) {
+                  const photoReference = placeDetails.photos[0].photo_reference;
+                  const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${googleAPIKey}`;
+                  location.image = photoUrl;
+                } else {
+                  location.image = null;
+                }
+              }
+            } else {
+              location.address = null;
+              location.website = null;
+              location.image = null;
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching data for location:", error);
+          });
+        promises.push(promise);
       }
     }
+    await Promise.all(promises);
+    console.log("sucess await promisses")
   } catch (error) {
     throw new Error("Error fetching data from Google Maps API");
   }
 }
+
 
 router.post("/post", async (req, res) => {
   try {
@@ -211,9 +225,9 @@ router.post("/post", async (req, res) => {
     const formattedResponse = formatResponse(gptResponse);
 
     for (const arrCity of formattedResponse) {
+      arrCity.cityInfo[0].country = countryName;
       await fetchDataFromGoogle(arrCity, arrCity.cityName, countryCode);
     }
-
     res.json({ response: formattedResponse });
   } catch (error) {
     console.error(error);
