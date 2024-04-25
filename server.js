@@ -19,7 +19,7 @@ app.use((req, res, next) => {
 });
 
 const hostname = "0.0.0.0";
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 app.listen(port, hostname, () => {
   mongodb.connect();
