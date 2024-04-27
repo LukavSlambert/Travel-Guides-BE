@@ -5,15 +5,19 @@ const handleServerError = require("../../libs/utility/ErrorHandlers.js");
 const tripSchema = require("../../libs/schemas/trips.js");
 const validate = require("../../libs/validation.js");
 
-router.post("/", validate(tripSchema), async (req, res) => {
-  const newTrip = req.body;
-  try {
-    const trip = await tripQuerys.createTrip(newTrip);
-    res.status(200).json(trip);
-  } catch (err) {
-    handleServerError(err, res);
+router.post(
+  "/",
+  // validate(tripSchema),
+  async (req, res) => {
+    const newTrip = req.body;
+    try {
+      const trip = await tripQuerys.createTrip(newTrip);
+      res.status(200).json(trip);
+    } catch (err) {
+      handleServerError(err, res);
+    }
   }
-});
+);
 
 router.delete("/:id", async (req, res) => {
   const tripId = req.params.id;

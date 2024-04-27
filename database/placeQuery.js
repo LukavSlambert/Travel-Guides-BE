@@ -13,26 +13,30 @@ const placeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  cityInfo: [
-    {
-      cityCode: {
-        type: String,
-        required: true,
-      },
-      description: {
-        type: String,
-        required: true,
-      },
-      lat: {
-        type: Number, // Changed to Number
-        required: true,
-      },
-      lng: {
-        type: Number, // Changed to Number
-        required: true,
-      },
-    },
-  ],
+  countryName: {
+    type: String,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
+  },
+  website: {
+    type: String,
+    required: true,
+  },
+  image: {
+    type: String,
+    required: true,
+  },
   type: {
     type: String,
     required: true,
@@ -43,17 +47,17 @@ const Hotels = mongoose.model("hotels", placeSchema);
 const Restaurants = mongoose.model("restaurants", placeSchema);
 const Attractions = mongoose.model("attractions", placeSchema);
 
-async function addPlaceToCollection(place, model) {
+async function addPlaceToCollection(place, Model) {
   try {
-    const { cityName } = model;
-    const existingPlace = await model.findOne({ cityName });
-
-    if (existingPlace) {
-      return existingPlace;
-    } else {
-      const newPlace = new model(place);
+    const { name, address } = place;
+    const existingPlace = await Model.findOne({ name, address });
+    console.log(existingPlace);
+    if (existingPlace == null) {
+      const newPlace = new Model(place);
       const savedPlace = await newPlace.save();
       return savedPlace;
+    } else {
+      return existingPlace;
     }
   } catch (error) {
     console.log("Error in addPlaceToCollection:", error);

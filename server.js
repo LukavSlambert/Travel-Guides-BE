@@ -13,6 +13,7 @@ app.use("/gptData", require("./routes/gptData/addPlace.js"));
 app.use("/users", require("./routes/users/user.js"));
 app.use("/gpt", require("./routes/aiAPIs/apis.js"));
 app.use("/review", require("./routes/reviews/reviews.js"));
+app.use("/trip", require("./routes/trips/trips.js"));
 
 const hostname = "0.0.0.0";
 const port = 3001;

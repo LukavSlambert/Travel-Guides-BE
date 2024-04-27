@@ -4,12 +4,12 @@ const ObjectId = Schema.Types.ObjectId;
 
 const reviewSchema = new Schema({
   userId: {
-    type: ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
   placeId: {
-    type: ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
   date: {
@@ -30,13 +30,29 @@ const reviewSchema = new Schema({
 
 const Review = mongoose.model("Review", reviewSchema);
 
+async function getReviews(placeId) {
+  console.log(placeId);
+  try {
+    const reviews = await Review.find({ placeId });
+    console.log(reviews);
+    return reviews;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
 // Function to calculate the average rating for a given placeId
 async function calculateAverageRating(placeId) {
   try {
     const pipeline = [
       {
         $match: {
-          placeId: mongoose.Types.ObjectId(placeId),
+          userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+          },
+          placeId: { type: mongoose.Schema.Types.ObjectId, required: true },
+
           rating: { $ne: null }, // Filter out documents with null rating
         },
       },
@@ -62,14 +78,14 @@ async function calculateAverageRating(placeId) {
 }
 
 // Example usage
-const placeId = "YourPlaceIdHere"; // Replace 'YourPlaceIdHere' with the actual placeId
-calculateAverageRating(placeId)
-  .then((averageRating) => {
-    console.log("Average Rating:", averageRating);
-  })
-  .catch((error) => {
-    console.error("Error:", error);
-  });
+// const placeId = "YourPlaceIdHere"; // Replace 'YourPlaceIdHere' with the actual placeId
+// calculateAverageRating(placeId)
+//   .then((averageRating) => {
+//     console.log("Average Rating:", averageRating);
+//   })
+//   .catch((error) => {
+//     console.error("Error:", error);
+//   });
 
 async function createReview(review) {
   try {
@@ -94,16 +110,6 @@ async function createReview(review) {
   }
 }
 
-async function getReviews(placeId) {
-  try {
-    const reviews = await Review.find({ placeId });
-    return reviews;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-}
-
 async function deleteReviewById(reviewId) {
   try {
     const deletedReview = await Review.findByIdAndDelete(reviewId);
@@ -118,4 +124,5 @@ module.exports = {
   createReview,
   deleteReviewById,
   getReviews,
+  calculateAverageRating,
 };

@@ -59,6 +59,7 @@ const Trip = mongoose.model("Trip", tripSchema);
 const createTrip = async function (newTrip) {
   try {
     const trip = new Trip(newTrip);
+    console.log(trip);
     await trip.save();
     return trip;
   } catch (err) {
