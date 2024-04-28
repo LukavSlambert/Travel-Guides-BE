@@ -40,6 +40,39 @@ router.post("/", async (req, res) => {
     handleServerError(err, res);
   }
 });
+router.post("/:placeId", async (req, res) => {
+  try {
+    // Extract the placeId and type from the request parameters
+    const { placeId } = req.params;
+    const { type } = req.body;
+
+    // Validate the place type
+    const Model = getPlaceModelFromPlaceType(type);
+
+    if (Model === null) {
+      res.status(400).json({ error: `Invalid place type: ${type}` });
+      return;
+    }
+
+    // Check if the place exists in the database
+    const existingPlace = await Model.findOne({ _id: placeId });
+
+    if (existingPlace) {
+      // If the place exists, create a review for it
+      const review = await reviewQuery.createReview(existingPlace._id);
+
+      res.status(200).json({
+        message: "Review created successfully.",
+        review: review,
+      });
+    } else {
+      res.status(404).json({ message: "Place not found in database." });
+    }
+  } catch (err) {
+    // Handle any server errors
+    handleServerError(err, res);
+  }
+});
 
 router.delete("/:id", async (req, res) => {
   const reviewId = req.params.id;
