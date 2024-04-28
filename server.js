@@ -15,7 +15,6 @@ app.use("/users", require("./routes/users/user.js"))
 app.use("/gpt", require("./routes/aiAPIs/apis.js"))
 app.use("/review", require("./routes/reviews/reviews.js"));
 app.use("/trip", require("./routes/trips/trips.js"));
-app.use("/addAttraction", require("./routes/attractions/add.js"));
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
   next();
