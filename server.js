@@ -15,8 +15,12 @@ app.use("/gpt", require("./routes/aiAPIs/apis.js"));
 app.use("/review", require("./routes/reviews/reviews.js"));
 app.use("/trip", require("./routes/trips/trips.js"));
 
+app.get("/", (req, res) => {
+  res.send("Hello, world!");
+});
+
 const hostname = "0.0.0.0";
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 app.listen(port, hostname, () => {
   mongodb.connect();
