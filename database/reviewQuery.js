@@ -47,11 +47,7 @@ async function calculateAverageRating(placeId) {
     const pipeline = [
       {
         $match: {
-          userId: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: true,
-          },
-          placeId: { type: mongoose.Schema.Types.ObjectId, required: true },
+          placeId: placeId,
 
           rating: { $ne: null }, // Filter out documents with null rating
         },
@@ -87,21 +83,29 @@ async function calculateAverageRating(placeId) {
 //     console.error("Error:", error);
 //   });
 
-async function createReview(review) {
+async function createReview({ userId, placeId, rating, text, author }) {
   try {
     const existingReview = await Review.findOne({
-      userId: review.userId,
-      placeId: review.placeId,
+      userId,
+      placeId,
     });
 
-    if (existingReview) {
-      existingReview.rating = review.rating;
-      existingReview.text = review.text;
+    if (existingReview != null) {
+      existingReview.rating = rating;
+      existingReview.text = text;
       existingReview.date = Date.now();
       await existingReview.save();
       return existingReview;
     } else {
-      const newReview = await Review.create(review);
+      const newReview = new Review({
+        userId,
+        placeId,
+        rating,
+        text,
+        date: Date.now(),
+        author,
+      });
+      await newReview.save();
       return newReview;
     }
   } catch (err) {

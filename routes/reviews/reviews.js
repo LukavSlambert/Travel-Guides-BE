@@ -3,6 +3,7 @@ const router = express.Router();
 const reviewQuery = require("../../database/reviewQuery.js"); // Corrected import path
 const handleServerError = require("../../libs/utility/ErrorHandlers.js");
 const validate = require("../../libs/validation.js");
+const auth = require("../../libs/authentication.js");
 
 const getPlaceModelFromPlaceType = require("../../libs/utility/ModelPlace.js");
 
@@ -40,26 +41,34 @@ router.post("/", async (req, res) => {
     handleServerError(err, res);
   }
 });
-router.post("/:placeId", async (req, res) => {
-  try {
-    // Extract the placeId and type from the request parameters
-    const { placeId } = req.params;
-    const { type } = req.body;
 
-    // Validate the place type
+//add middleware to check the authantication user. take userId from token
+
+router.post("/:name", auth.authenticate, async (req, res) => {
+  try {
+    const { name } = req.params;
+    const { address, type, userId, rating, text, username } = req.body;
+    //todo-validate userid and username (req,decoded)
+    //add 403 if review author is  login user
     const Model = getPlaceModelFromPlaceType(type);
 
     if (Model === null) {
       res.status(400).json({ error: `Invalid place type: ${type}` });
       return;
     }
-
-    // Check if the place exists in the database
-    const existingPlace = await Model.findOne({ _id: placeId });
+    const existingPlace = await Model.findOne({
+      name: name,
+      address: address,
+    });
 
     if (existingPlace) {
-      // If the place exists, create a review for it
-      const review = await reviewQuery.createReview(existingPlace._id);
+      const review = await reviewQuery.createReview({
+        userId,
+        placeId: existingPlace._id,
+        rating,
+        text,
+        author: username,
+      });
 
       res.status(200).json({
         message: "Review created successfully.",
@@ -69,7 +78,6 @@ router.post("/:placeId", async (req, res) => {
       res.status(404).json({ message: "Place not found in database." });
     }
   } catch (err) {
-    // Handle any server errors
     handleServerError(err, res);
   }
 });
@@ -86,7 +94,5 @@ router.delete("/:id", async (req, res) => {
     handleServerError(err, res);
   }
 });
-
-//do post each review
 
 module.exports = router;
