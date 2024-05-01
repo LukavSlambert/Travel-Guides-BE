@@ -42,8 +42,9 @@ router.put('/:id', auth.authenticate, async (req, res) => {
                 const hash_password = await bcrypt.hash(user_newdata.password, saltRounds);
                 user_newdata.password = hash_password
             }
-            const update_user = await userQuerys.UpdateUser(req.params.id, user_newdata)
-            res.send(update_user)
+            await userQuerys.UpdateUser(req.params.id, user_newdata)
+            const updated_user = await userQuerys.GetUserByID(req.params.id)
+            res.send(updated_user)
         }
 
     } catch (err) {
