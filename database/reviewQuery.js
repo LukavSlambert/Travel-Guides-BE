@@ -65,23 +65,13 @@ async function calculateAverageRating(placeId) {
     if (result.length > 0) {
       return result[0].averageRating;
     } else {
-      return 0; // If there are no reviews for the given placeId, return 0
+      return 0;
     }
   } catch (error) {
     console.error("Error calculating average rating:", error);
     throw error;
   }
 }
-
-// Example usage
-// const placeId = "YourPlaceIdHere"; // Replace 'YourPlaceIdHere' with the actual placeId
-// calculateAverageRating(placeId)
-//   .then((averageRating) => {
-//     console.log("Average Rating:", averageRating);
-//   })
-//   .catch((error) => {
-//     console.error("Error:", error);
-//   });
 
 async function createReview({ userId, placeId, rating, text, author }) {
   try {

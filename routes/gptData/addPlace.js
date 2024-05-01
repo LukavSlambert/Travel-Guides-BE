@@ -3,8 +3,9 @@ const router = express.Router();
 const validate = require("../../libs/validation.js");
 const { addPlaceToCollection } = require("../../database/placeQuery.js");
 const getPlaceModelFromPlaceType = require("../../libs/utility/ModelPlace.js");
+const placeSchema = require("../../libs/schemas/places.js");
 
-router.post("/", async (req, res) => {
+router.post("/", validate(placeSchema), async (req, res) => {
   try {
     const place = req.body;
     const { type } = place;
