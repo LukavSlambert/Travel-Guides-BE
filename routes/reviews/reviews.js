@@ -47,7 +47,8 @@ router.post("/", async (req, res) => {
 router.post("/:name", auth.authenticate, async (req, res) => {
   try {
     const { name } = req.params;
-    const { address, type, userId, rating, text, username } = req.body;
+    const { address, type, userId, rating, text } = req.body;
+    const { username } = req.decoded;
     //todo-validate userid and username (req,decoded)
     //add 403 if review author is  login user
     const Model = getPlaceModelFromPlaceType(type);
