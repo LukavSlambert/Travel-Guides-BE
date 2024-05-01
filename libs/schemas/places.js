@@ -2,7 +2,7 @@ const S = require("fluent-json-schema");
 
 const placeSchema = S.object()
   .prop("userId", S.string().required())
-  .prop("date", S.string().format("date-time").required())
+  // .prop("date", S.string().format("date-time").required())
   .prop("cityName", S.string().required())
   .prop("countryName", S.string().required())
   .prop("name", S.string().required())

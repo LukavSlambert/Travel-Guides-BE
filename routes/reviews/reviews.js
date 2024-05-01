@@ -42,15 +42,11 @@ router.post("/", async (req, res) => {
   }
 });
 
-//add middleware to check the authantication user. take userId from token
-
 router.post("/:name", auth.authenticate, async (req, res) => {
   try {
     const { name } = req.params;
-    const { address, type, userId, rating, text } = req.body;
-    const { username } = req.decoded;
-    //todo-validate userid and username (req,decoded)
-    //add 403 if review author is  login user
+    const { address, type, rating, text } = req.body;
+    const { username, id } = req.decoded;
     const Model = getPlaceModelFromPlaceType(type);
 
     if (Model === null) {
@@ -64,7 +60,7 @@ router.post("/:name", auth.authenticate, async (req, res) => {
 
     if (existingPlace) {
       const review = await reviewQuery.createReview({
-        userId,
+        userId: id,
         placeId: existingPlace._id,
         rating,
         text,
