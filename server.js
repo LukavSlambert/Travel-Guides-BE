@@ -2,7 +2,22 @@ require("dotenv").config();
 const mongodb = require("./database/mongodb.js");
 
 const express = require("express");
+const bodyParser = require("body-parser");
+
 const app = express();
+ app.use(
+   bodyParser.urlencoded({
+     limit: "50mb",
+     parameterLimit: 100000000,
+   })
+ );
+
+ app.use(
+   bodyParser.json({
+     limit: "50mb",
+     parameterLimit: 10000000,
+   })
+ );
 
 app.use(require("cors")());
 app.use(express.json());
