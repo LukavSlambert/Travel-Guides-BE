@@ -26,13 +26,13 @@ router.get('/:email/:password', auth.authenticate, async (req, res) => {
     }
 })
 
-router.put('/:id/:password', auth.authenticate, async (req, res) => {
+router.put('/:id', auth.authenticate, async (req, res) => {
     const user_newdata = { ...req.body }
     try {
         const user = await userQuerys.GetUserByID(req.params.id)
         if (!user) return res.status(400).send("User doesn't exist")
 
-        const password_valid = await bcrypt.compare(req.params.password, user.password);
+        const password_valid = await bcrypt.compare(req.body.password, user.password);
 
         if (!password_valid) {
             res.statusMessage = "ID or password incorrect";
