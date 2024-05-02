@@ -6,7 +6,8 @@ const ObjectId = Schema.ObjectId;
 const NewUser = new Schema({
     username: String,
     email: String,
-    password: String
+    password: String,
+    age: Number,
 });
 
 const User = mongoose.model('User', NewUser)
@@ -69,6 +70,7 @@ async function UpdateUser(id, data) {
                 email: data.email,
                 username: data.username,
                 password: data.password,
+                age: data.age
             });
         return user
     } catch (err) {
