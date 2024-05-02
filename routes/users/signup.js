@@ -23,15 +23,20 @@ router.post('/', validate(usersSchemas.newUserSchema), async (req, res) => {
                 email: req.body.email,
                 password: hash_password,
             }
-            await userQuerys.CreateUser(user)
-            delete user.password
-            const token = auth.sign({ id: user._id });
-            res.send({ user, token })
+            const response = await CreateNewUser(user)
+            res.send(response)
         }
 
     } catch (err) {
         handleServerError(err, res)
     }
 })
+
+async function CreateNewUser(data) {
+    await userQuerys.CreateUser(data)
+    const user = await userQuerys.GetUserByEmail(data.email)
+    const token = auth.sign({ id: user._id, username: user.username });
+    return { user, token }
+}
 
 module.exports = router;
