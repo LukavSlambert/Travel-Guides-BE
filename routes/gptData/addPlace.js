@@ -9,6 +9,7 @@ router.post("/", validate(placeSchema), async (req, res) => {
   try {
     const place = req.body;
     const { type } = place;
+    // const { id } = req.decoded;
 
     const Model = getPlaceModelFromPlaceType(type);
 
